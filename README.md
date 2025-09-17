@@ -1,210 +1,289 @@
-App Usage Tutorial
-This tutorial guides you through testing the application's core features using Postman.
+# App Usage Tutorial
 
-Prerequisites
-Postman: Ensure Postman is installed.
-Services Running: M1 (port 8081), M2 (port 8082), M3 (port 8083) should be running.
-Database: Your MySQL database should be running and accessible.
-Setup (Postman Environment Recommended)
-1. Postman Testing Guide
-Authentication & User Setup
-Register User 1
+Acest tutorial te ghidează prin testarea funcționalităților cheie ale aplicației folosind Postman.
 
-Method: POST
-URL: http://localhost:8081/api/user/register
-Headers: Content-Type: application/json
-Body (raw JSON):
-{
-    "name": "Alice",
-    "email": "alice@example.com",
-    "password": "password123",
-    "roleName": "USER"
-}
-Response: 201 Created
-Register User 2
 
-Method: POST
-URL: http://localhost:8081/api/user/register
-Headers: Content-Type: application/json
-Body (raw JSON):
-{
-    "name": "Bob",
-    "email": "bob@example.com",
-    "password": "password456",
-    "roleName": "USER"
-}
-Response: 201 Created
-Login (User 1 - Alice)
+## ⚙️ Cerințe preliminare
 
-Method: POST
-URL: http://localhost:8081/api/user/login
-Headers: Content-Type: application/json
-Body (raw JSON):
-{
-    "email": "alice@example.com",
-    "password": "password123"
-}
-Response: 200 OK. Note the token and userId.
-Action: Save the token to the {{authToken}} environment variable. Save Alice's userId to {{userId1}}.
-Posts (Requires Authentication for Create/Update/Delete)
-Note: For all authenticated requests below, set Authorization: Bearer Token {{authToken}}.
-Create Post
+* **Postman**: Asigură-te că Postman este instalat.
+* **Servicii Rulând**: M1 (port `8081`), M2 (port `8082`), M3 (port `8083`) trebuie să fie pornite.
+* **Bază de Date**: Baza ta de date MySQL trebuie să ruleze și să fie accesibilă.
 
-Method: POST
-URL: http://localhost:8081/api/posts
-Authorization: Bearer Token {{authToken}}
-Body: form-data
-content (Text): My first post! #awesome
-postType (Text): TEXT_WITH_IMAGE (Options: TEXT, IMAGE, TEXT_WITH_IMAGE)
-hashtags (Text): #awesome (Add more 'hashtags' keys for multiple tags)
-image (File): (Optional) Use "Select Files" to upload an image if type includes IMAGE.
-Response: 201 Created. Note the id of the new post.
-Action: Save the post id to {{postId}}.
-Get All Posts (Auth Optional)
+---
 
-Method: GET
-URL: http://localhost:8081/api/posts
-Authorization: (Optional) Bearer Token {{authToken}}
-Response: 200 OK with a list of posts.
-Get Posts by User (Auth Optional)
+## 🔧 Configurare (Recomandat: Postman Environment)
 
-Method: GET
-URL: http://localhost:8081/api/posts/user/{{userId1}} (Replace userId1 with desired user ID)
-Authorization: (Optional) Bearer Token {{authToken}}
-Response: 200 OK with posts by the specified user.
-Get Posts by Hashtag (Auth Optional)
+1.  ### Ghid de Testare Postman
 
-Method: GET
-URL: http://localhost:8081/api/posts/hashtag/java (if you want to see the posts with #java hashtag)
-Authorization: (Optional) Bearer Token {{authToken}}
-Response: 200 OK with posts containing the hashtag.
-Update Post
+    #### Autentificare & Configurarea Utilizatorilor
 
-Method: PUT
-URL: http://localhost:8081/api/posts/{{postId}}
-Authorization: Bearer Token {{authToken}}
-Body: form-data (Include fields to update, e.g., content, hashtags, image)
-content: My updated post content. #updated
-postType: TEXT
-hashtags: #updated
-Response: 200 OK with the updated post details.
-Comments (Requires Authentication for Create/Update/Delete)
-Note: For all authenticated requests below, set Authorization: Bearer Token {{authToken}}.
-Create Comment
+    ---
 
-Method: POST
-URL: http://localhost:8081/api/comments/post/{{postId}} (Use ID of an existing post)
-Authorization: Bearer Token {{authToken}}
-Headers: Content-Type: application/json
-Body (raw JSON):
-{
-    "content": "This is a comment on the post!"
-}
-Response: 201 Created. Note the id of the new comment.
-Action: Save the comment id to {{commentId}}.
-Get Comments for Post (Auth Optional)
+    ##### **1. Înregistrare Utilizator 1 (Alice)**
+    ```
+    Method: POST
+    URL: http://localhost:8081/api/user/register
+    Headers: Content-Type: application/json
+    Body (raw JSON):
+    {
+        "name": "Alice",
+        "email": "alice@example.com",
+        "password": "password123",
+        "roleName": "USER"
+    }
+    ```
+    **Response:** `201 Created`
 
-Method: GET
-URL: http://localhost:8081/api/comments/post/{{postId}}
-Authorization: (Optional) Bearer Token {{authToken}}
-Response: 200 OK with a list of comments for the post.
-Friend Requests (Requires Authentication)
-Note: For all authenticated requests below, set Authorization: Bearer Token {{authToken}}. You may need to log in as the appropriate user (sender or receiver) and update {{authToken}}.
-Send Friend Request (e.g., Alice sends to Bob)
+    ##### **2. Înregistrare Utilizator 2 (Bob)**
+    ```
+    Method: POST
+    URL: http://localhost:8081/api/user/register
+    Headers: Content-Type: application/json
+    Body (raw JSON):
+    {
+        "name": "Bob",
+        "email": "bob@example.com",
+        "password": "password456",
+        "roleName": "USER"
+    }
+    ```
+    **Response:** `201 Created`
 
-Method: POST
-URL: {{baseURL}}/api/friends/send/{{userId2}} (Use receiver's ID)
-Authorization: Bearer Token {{authToken}} (Sender's token)
-Response: 200 OK. If the request ID is returned, note it.
-Action: Assume request ID is 1 for example, save to {{friendRequestId}}.
-Accept Friend Request (e.g., Bob accepts from Alice)
+    ---
 
-Action: Login as Bob, update {{authToken}} with Bob's token.
-Method: POST
-URL: {{baseURL}}/api/friends/accept/{{friendRequestId}} (Use the ID of the request)
-Authorization: Bearer Token {{authToken}} (Receiver's token)
-Response: 200 OK.
-Reject Friend Request (Alternative to Accept)
+    ##### **3. Autentificare (Utilizator 1 - Alice)**
+    ```
+    Method: POST
+    URL: http://localhost:8081/api/user/login
+    Headers: Content-Type: application/json
+    Body (raw JSON):
+    {
+        "email": "alice@example.com",
+        "password": "password123"
+    }
+    ```
+    **Response:** `200 OK`. Notează `token`-ul și `userId`-ul.
+    **Acțiune:** Salvează `token`-ul în variabila de mediu `{{authToken}}`. Salvează `userId`-ul lui Alice în `{{userId1}}`.
 
-Action: Login as Bob, update {{authToken}} with Bob's token.
-Method: POST
-URL: {{baseURL}}/api/friends/reject/{{friendRequestId}} (Use the ID of the request)
-Authorization: Bearer Token {{authToken}} (Receiver's token)
-Response: 200 OK.
-View Pending Requests (e.g., Bob views requests sent to him)
+---
 
-Action: Ensure logged in as the user whose pending requests you want to see (e.g., Bob), update {{authToken}}.
-Method: GET
-URL: {{baseURL}}/api/friends/pending
-Authorization: Bearer Token {{authToken}}
-Response: 200 OK with a list of pending requests where the current user is the receiver.
-User Management (Requires Admin Authentication - Be Cautious with Update/Delete)
-Register Admin User
+### **Funcționalități Principale**
 
-Method: POST
-URL: http://localhost:8081/api/user/register
-Headers: Content-Type: application/json
-Body (raw JSON):
-{
-"name": "Admin_user3",
-"email": "admin3@admin.com",
-"password": "adminpassword",
-"roleName": "ADMIN"
-}
-Response: 201 Created.
-Login as Admin
+#### Postări (Necesită Autentificare pentru Creare/Actualizare/Ștergere)
 
-Method: POST
-URL: http://localhost:8081/api/user/login
-Headers: Content-Type: application/json
-Body (raw JSON):
-{
-"email": "admin3@admin.com",
-"password": "adminpassword"
-}
-Response: 200 OK. Note the token and userId.
-Block User
+**Notă:** Pentru toate cererile autentificate de mai jos, setează **Authorization: Bearer Token** `{{authToken}}`.
 
-Method: POST
-URL: http://localhost:8081/api/user/block/{{userId}} (Use the ID of the user to block)
-Authorization: Bearer Token {{authToken}} (Admin's token)
-Response: 200 OK.
-Unblock User
+---
 
-Method: POST
-URL: http://localhost:8081/api/user/unblock/{{userId}} (Use the ID of the user to unblock)
-Authorization: Bearer Token {{authToken}} (Admin's token)
-Response: 200 OK.
-Delete a User
+* **Creare Postare**
+    ```
+    Method: POST
+    URL: http://localhost:8081/api/posts
+    Authorization: Bearer Token {{authToken}}
+    Body: form-data
+        content (Text): My first post! #awesome
+        postType (Text): TEXT_WITH_IMAGE (Opțiuni: TEXT, IMAGE, TEXT_WITH_IMAGE)
+        hashtags (Text): #awesome (Adaugă mai multe chei 'hashtags' pentru etichete multiple)
+        image (File): (Opțional) Folosește "Select Files" pentru a încărca o imagine dacă tipul include IMAGE.
+    ```
+    **Response:** `201 Created`. Notează `id`-ul noii postări.
+    **Acțiune:** Salvează `id`-ul postării în variabila de mediu `{{postId}}`.
 
-Method: DELETE
-URL: http://localhost:8081/api/user/{{userId}} (Use the ID of the user to delete)
-Authorization: Bearer Token {{authToken}} (Admin's token)
-Response: 200 OK.
-Note:* Be cautious with this action as it permanently deletes the user and their data.
-Delete a Comment
+* **Obține Toate Postările** (Autentificare Opțională)
+    ```
+    Method: GET
+    URL: http://localhost:8081/api/posts
+    Authorization: (Opțional) Bearer Token {{authToken}}
+    ```
+    **Response:** `200 OK` cu o listă de postări.
 
-Method: DELETE
-URL: http://localhost:8081/api/comments/{{commentId}} (Use the ID of the comment to delete)
-Authorization: Bearer Token {{authToken}} (User's token)
-Response: 200 OK.
-Note:* Be cautious with this action as it permanently deletes the comment.
-Testing Workflow Summary
-Register User 1 (Alice) and User 2 (Bob).
-Login as Alice, save her token to {{authToken}} and ID to {{userId1}}. Save Bob's ID to {{userId2}}.
-(As Alice) Create a Post, save ID to {{postId}}.
-(As Alice) Create a Comment on the post, save ID to {{commentId}}.
-Test various GET endpoints for Posts and Comments (Auth optional).
-(As Alice) Update the Post.
-(As Alice) Update the Comment.
-(As Alice) Send Friend Request to Bob ({{userId2}}), save request ID to {{friendRequestId}}.
-Login as Bob, update {{authToken}}.
-(As Bob) Accept/Reject Friend Request using {{friendRequestId}}.
-Login back as Alice (update {{authToken}}).
-(As Alice) Delete the Comment using {{commentId}}.
-(As Alice) Delete the Post using {{postId}}.
-(As Admin) Register an Admin user, login, and test blocking/unblocking users.
-(As Admin) Delete a user using their ID.
-(As Admin) Delete a comment using its ID.
-Remember to replace placeholders like {postId}, {commentId}, {userId1}, {userId2}, {friendRequestId} and YOUR_JWT_TOKEN (via {{authToken}}) with actual values during testing.
-Aplicație tip rețea socială, cu backend distribuit pe microservicii (M1, M2, M3) și bază de date MySQL, care oferă funcționalități precum înregistrare și autentificare utilizatori, gestionarea postărilor (text, imagini, hashtag-uri), comentarii, cereri de prietenie și management de utilizatori (inclusiv roluri de Admin,Moderator).
+* **Obține Postări după Utilizator** (Autentificare Opțională)
+    ```
+    Method: GET
+    URL: http://localhost:8081/api/posts/user/{{userId1}} (Înlocuiește userId1 cu ID-ul dorit)
+    Authorization: (Opțional) Bearer Token {{authToken}}
+    ```
+    **Response:** `200 OK` cu postările utilizatorului specificat.
+
+* **Obține Postări după Hashtag** (Autentificare Opțională)
+    ```
+    Method: GET
+    URL: http://localhost:8081/api/posts/hashtag/java
+    Authorization: (Opțional) Bearer Token {{authToken}}
+    ```
+    **Response:** `200 OK` cu postările care conțin hashtag-ul.
+
+* **Actualizare Postare**
+    ```
+    Method: PUT
+    URL: http://localhost:8081/api/posts/{{postId}}
+    Authorization: Bearer Token {{authToken}}
+    Body: form-data (Include câmpuri de actualizat, ex: content, hashtags, image)
+        content: My updated post content. #updated
+        postType: TEXT
+        hashtags: #updated
+    ```
+    **Response:** `200 OK` cu detaliile postării actualizate.
+
+---
+
+#### Comentarii (Necesită Autentificare pentru Creare/Actualizare/Ștergere)
+
+**Notă:** Pentru toate cererile autentificate de mai jos, setează **Authorization: Bearer Token** `{{authToken}}`.
+
+---
+
+* **Creare Comentariu**
+    ```
+    Method: POST
+    URL: http://localhost:8081/api/comments/post/{{postId}} (Folosește ID-ul unei postări existente)
+    Authorization: Bearer Token {{authToken}}
+    Headers: Content-Type: application/json
+    Body (raw JSON):
+    {
+        "content": "This is a comment on the post!"
+    }
+    ```
+    **Response:** `201 Created`. Notează `id`-ul noului comentariu.
+    **Acțiune:** Salvează `id`-ul comentariului în variabila de mediu `{{commentId}}`.
+
+* **Obține Comentarii pentru o Postare** (Autentificare Opțională)
+    ```
+    Method: GET
+    URL: http://localhost:8081/api/comments/post/{{postId}}
+    Authorization: (Opțional) Bearer Token {{authToken}}
+    ```
+    **Response:** `200 OK` cu o listă de comentarii pentru postare.
+
+---
+
+#### Cereri de Prietenie (Necesită Autentificare)
+
+**Notă:** Pentru toate cererile autentificate de mai jos, setează **Authorization: Bearer Token** `{{authToken}}`. S-ar putea să fie nevoie să te autentifici ca utilizatorul corespunzător (expeditor sau destinatar) și să actualizezi `{{authToken}}`.
+
+---
+
+* **Trimite Cerere de Prietenie** (ex: Alice trimite lui Bob)
+    ```
+    Method: POST
+    URL: {{baseURL}}/api/friends/send/{{userId2}} (Folosește ID-ul destinatarului)
+    Authorization: Bearer Token {{authToken}} (Token-ul expeditorului)
+    ```
+    **Response:** `200 OK`. Dacă este returnat ID-ul cererii, notează-l.
+    **Acțiune:** Presupunem că ID-ul cererii este `1`, salvează-l în `{{friendRequestId}}`.
+
+* **Acceptă Cerere de Prietenie** (ex: Bob acceptă de la Alice)
+    **Acțiune:** Autentifică-te ca Bob, actualizează `{{authToken}}` cu token-ul lui Bob.
+    ```
+    Method: POST
+    URL: {{baseURL}}/api/friends/accept/{{friendRequestId}} (Folosește ID-ul cererii)
+    Authorization: Bearer Token {{authToken}} (Token-ul destinatarului)
+    ```
+    **Response:** `200 OK`.
+
+* **Respinge Cerere de Prietenie** (Alternativă la Acceptare)
+    **Acțiune:** Autentifică-te ca Bob, actualizează `{{authToken}}` cu token-ul lui Bob.
+    ```
+    Method: POST
+    URL: {{baseURL}}/api/friends/reject/{{friendRequestId}} (Folosește ID-ul cererii)
+    Authorization: Bearer Token {{authToken}} (Token-ul destinatarului)
+    ```
+    **Response:** `200 OK`.
+
+* **Vizualizează Cereri în Așteptare** (ex: Bob vizualizează cererile trimise către el)
+    **Acțiune:** Asigură-te că ești autentificat ca utilizatorul ale cărui cereri în așteptare vrei să le vezi (ex: Bob), actualizează `{{authToken}}`.
+    ```
+    Method: GET
+    URL: {{baseURL}}/api/friends/pending
+    Authorization: Bearer Token {{authToken}}
+    ```
+    **Response:** `200 OK` cu o listă de cereri în așteptare unde utilizatorul curent este destinatarul.
+
+---
+
+#### Administrare Utilizatori (Necesită Autentificare Admin - Fii precaut cu Actualizarea/Ștergerea)
+
+---
+
+* **Înregistrare Utilizator Admin**
+    ```
+    Method: POST
+    URL: http://localhost:8081/api/user/register
+    Headers: Content-Type: application/json
+    Body (raw JSON):
+    {
+        "name": "Admin_user3",
+        "email": "admin3@admin.com",
+        "password": "adminpassword",
+        "roleName": "ADMIN"
+    }
+    ```
+    **Response:** `201 Created`.
+
+* **Autentificare ca Admin**
+    ```
+    Method: POST
+    URL: http://localhost:8081/api/user/login
+    Headers: Content-Type: application/json
+    Body (raw JSON):
+    {
+        "email": "admin3@admin.com",
+        "password": "adminpassword"
+    }
+    ```
+    **Response:** `200 OK`. Notează `token`-ul și `userId`-ul.
+
+* **Blocare Utilizator**
+    ```
+    Method: POST
+    URL: http://localhost:8081/api/user/block/{{userId}} (Folosește ID-ul utilizatorului de blocat)
+    Authorization: Bearer Token {{authToken}} (Token-ul Adminului)
+    ```
+    **Response:** `200 OK`.
+
+* **Deblocare Utilizator**
+    ```
+    Method: POST
+    URL: http://localhost:8081/api/user/unblock/{{userId}} (Folosește ID-ul utilizatorului de deblocat)
+    Authorization: Bearer Token {{authToken}} (Token-ul Adminului)
+    ```
+    **Response:** `200 OK`.
+
+* **Ștergere Utilizator**
+    ```
+    Method: DELETE
+    URL: http://localhost:8081/api/user/{{userId}} (Folosește ID-ul utilizatorului de șters)
+    Authorization: Bearer Token {{authToken}} (Token-ul Adminului)
+    ```
+    **Response:** `200 OK`.
+    **Notă:** Fii precaut, această acțiune șterge permanent utilizatorul și datele sale.
+
+* **Ștergere Comentariu**
+    ```
+    Method: DELETE
+    URL: http://localhost:8081/api/comments/{{commentId}} (Folosește ID-ul comentariului de șters)
+    Authorization: Bearer Token {{authToken}} (Token-ul utilizatorului)
+    ```
+    **Response:** `200 OK`.
+    **Notă:** Fii precaut, această acțiune șterge permanent comentariul.
+
+---
+
+### 📝 Sumarul Fluxului de Testare
+
+1.  **Înregistrează** Utilizatorul 1 (**Alice**) și Utilizatorul 2 (**Bob**).
+2.  **Autentifică-te** ca Alice, salvează `token`-ul în `{{authToken}}` și ID-ul în `{{userId1}}`. Salvează ID-ul lui Bob în `{{userId2}}`.
+3.  **(Ca Alice)** **Creează** o Postare, salvează ID-ul în `{{postId}}`.
+4.  **(Ca Alice)** **Creează** un Comentariu pe postare, salvează ID-ul în `{{commentId}}`.
+5.  **Testează** diverse endpoint-uri `GET` pentru Postări și Comentarii (Autentificare opțională).
+6.  **(Ca Alice)** **Actualizează** Postarea.
+7.  **(Ca Alice)** **Actualizează** Comentariul.
+8.  **(Ca Alice)** **Trimite** o Cerere de Prietenie către Bob (`{{userId2}}`), salvează ID-ul cererii în `{{friendRequestId}}`.
+9.  **Autentifică-te** ca Bob, actualizează `{{authToken}}`.
+10. **(Ca Bob)** **Acceptă/Respinge** Cererea de Prietenie folosind `{{friendRequestId}}`.
+11. **Autentifică-te** din nou ca Alice (actualizează `{{authToken}}`).
+12. **(Ca Alice)** **Șterge** Comentariul folosind `{{commentId}}`.
+13. **(Ca Alice)** **Șterge** Postarea folosind `{{postId}}`.
+14. **(Ca Admin)** **Înregistrează** un utilizator Admin, **autentifică-te**, și **testează** blocarea/deblocarea utilizatorilor.
+15. **(Ca Admin)** **Șterge** un utilizator folosind ID-ul său.
+16. **(Ca Admin)** **Șterge** un comentariu folosind ID-ul său.
