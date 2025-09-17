@@ -1,0 +1,1 @@
+Aplicație tip rețea socială, cu backend distribuit pe microservicii (M1, M2, M3) și bază de date MySQL, care oferă funcționalități precum înregistrare și autentificare utilizatori, gestionarea postărilor (text, imagini, hashtag-uri), comentarii, cereri de prietenie și management de utilizatori (inclusiv roluri de Admin,Moderator).
